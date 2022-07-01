@@ -3564,10 +3564,10 @@ __STATIC_INLINE void LL_TIM_DisableBreakInputSource(TIM_TypeDef *TIMx, uint32_t 
   * @brief  Set the polarity of the break signal for the timer break input.
   * @note Macro IS_TIM_BREAKSOURCE_INSTANCE(TIMx) can be used to check whether
   *       or not a timer instance allows for break input selection.
-  * @rmtoll AF1          BKINE          LL_TIM_SetBreakInputSourcePolarity\n
-  *         AF1          BKDFBKE        LL_TIM_SetBreakInputSourcePolarity\n
-  *         AF2          BK2INE         LL_TIM_SetBreakInputSourcePolarity\n
-  *         AF2          BK2DFBKE       LL_TIM_SetBreakInputSourcePolarity
+  * @rmtoll AF1          BKINP          LL_TIM_SetBreakInputSourcePolarity\n
+  *         AF1          BKDFBKP        LL_TIM_SetBreakInputSourcePolarity\n
+  *         AF2          BK2INP         LL_TIM_SetBreakInputSourcePolarity\n
+  *         AF2          BK2DFBKP       LL_TIM_SetBreakInputSourcePolarity
   * @param  TIMx Timer instance
   * @param  BreakInput This parameter can be one of the following values:
   *         @arg @ref LL_TIM_BREAK_INPUT_BKIN

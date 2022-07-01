@@ -514,7 +514,7 @@ HAL_StatusTypeDef HAL_LTDC_RegisterCallback(LTDC_HandleTypeDef *hltdc, HAL_LTDC_
 
 /**
   * @brief  Unregister an LTDC Callback
-  *         LTDC callabck is redirected to the weak predefined callback
+  *         LTDC callback is redirected to the weak predefined callback
   * @param hltdc ltdc handle
   * @param CallbackID ID of the callback to be unregistered
   *        This parameter can be one of the following values:

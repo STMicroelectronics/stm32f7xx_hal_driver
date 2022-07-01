@@ -737,6 +737,15 @@ typedef  void (*pTIM_CallbackTypeDef)(TIM_HandleTypeDef *htim);  /*!< pointer to
   * @}
   */
 
+/** @defgroup TIM_CC_DMA_Request CCx DMA request selection
+  * @{
+  */
+#define TIM_CCDMAREQUEST_CC                 0x00000000U                         /*!< CCx DMA request sent when capture or compare match event occurs */
+#define TIM_CCDMAREQUEST_UPDATE             TIM_CR2_CCDS                        /*!< CCx DMA requests sent when update event occurs */
+/**
+  * @}
+  */
+
 /** @defgroup TIM_Flag_definition TIM Flag Definition
   * @{
   */
@@ -777,16 +786,16 @@ typedef  void (*pTIM_CallbackTypeDef)(TIM_HandleTypeDef *htim);  /*!< pointer to
 /** @defgroup TIM_Clock_Source TIM Clock Source
   * @{
   */
-#define TIM_CLOCKSOURCE_ETRMODE2    TIM_SMCR_ETPS_1      /*!< External clock source mode 2                          */
 #define TIM_CLOCKSOURCE_INTERNAL    TIM_SMCR_ETPS_0      /*!< Internal clock source                                 */
+#define TIM_CLOCKSOURCE_ETRMODE1    TIM_TS_ETRF          /*!< External clock source mode 1 (ETRF)                   */
+#define TIM_CLOCKSOURCE_ETRMODE2    TIM_SMCR_ETPS_1      /*!< External clock source mode 2                          */
+#define TIM_CLOCKSOURCE_TI1ED       TIM_TS_TI1F_ED       /*!< External clock source mode 1 (TTI1FP1 + edge detect.) */
+#define TIM_CLOCKSOURCE_TI1         TIM_TS_TI1FP1        /*!< External clock source mode 1 (TTI1FP1)                */
+#define TIM_CLOCKSOURCE_TI2         TIM_TS_TI2FP2        /*!< External clock source mode 1 (TTI2FP2)                */
 #define TIM_CLOCKSOURCE_ITR0        TIM_TS_ITR0          /*!< External clock source mode 1 (ITR0)                   */
 #define TIM_CLOCKSOURCE_ITR1        TIM_TS_ITR1          /*!< External clock source mode 1 (ITR1)                   */
 #define TIM_CLOCKSOURCE_ITR2        TIM_TS_ITR2          /*!< External clock source mode 1 (ITR2)                   */
 #define TIM_CLOCKSOURCE_ITR3        TIM_TS_ITR3          /*!< External clock source mode 1 (ITR3)                   */
-#define TIM_CLOCKSOURCE_TI1ED       TIM_TS_TI1F_ED       /*!< External clock source mode 1 (TTI1FP1 + edge detect.) */
-#define TIM_CLOCKSOURCE_TI1         TIM_TS_TI1FP1        /*!< External clock source mode 1 (TTI1FP1)                */
-#define TIM_CLOCKSOURCE_TI2         TIM_TS_TI2FP2        /*!< External clock source mode 1 (TTI2FP2)                */
-#define TIM_CLOCKSOURCE_ETRMODE1    TIM_TS_ETRF          /*!< External clock source mode 1 (ETRF)                   */
 /**
   * @}
   */
@@ -1699,6 +1708,17 @@ mode.
     TIM_SET_CAPTUREPOLARITY((__HANDLE__), (__CHANNEL__), (__POLARITY__)); \
   }while(0)
 
+/** @brief  Select the Capture/compare DMA request source.
+  * @param  __HANDLE__ specifies the TIM Handle.
+  * @param  __CCDMA__ specifies Capture/compare DMA request source
+  *          This parameter can be one of the following values:
+  *            @arg TIM_CCDMAREQUEST_CC: CCx DMA request generated on Capture/Compare event
+  *            @arg TIM_CCDMAREQUEST_UPDATE: CCx DMA request generated on Update event
+  * @retval None
+  */
+#define __HAL_TIM_SELECT_CCDMAREQUEST(__HANDLE__, __CCDMA__)    \
+  MODIFY_REG((__HANDLE__)->Instance->CR2, TIM_CR2_CCDS, (__CCDMA__))
+
 /**
   * @}
   */
@@ -1783,7 +1803,7 @@ mode.
                                             ((__MODE__) == TIM_COUNTERMODE_CENTERALIGNED3))
 
 #define IS_TIM_UIFREMAP_MODE(__MODE__)     (((__MODE__) == TIM_UIFREMAP_DISABLE) || \
-                                            ((__MODE__) == TIM_UIFREMAP_ENALE))
+                                            ((__MODE__) == TIM_UIFREMAP_ENABLE))
 
 #define IS_TIM_CLOCKDIVISION_DIV(__DIV__)  (((__DIV__) == TIM_CLOCKDIVISION_DIV1) || \
                                             ((__DIV__) == TIM_CLOCKDIVISION_DIV2) || \
@@ -1843,20 +1863,23 @@ mode.
 #define IS_TIM_OPM_CHANNELS(__CHANNEL__)   (((__CHANNEL__) == TIM_CHANNEL_1) || \
                                             ((__CHANNEL__) == TIM_CHANNEL_2))
 
+#define IS_TIM_PERIOD(__HANDLE__, __PERIOD__) \
+  ((IS_TIM_32B_COUNTER_INSTANCE(((__HANDLE__)->Instance)) == 0U) ? (((__PERIOD__) > 0U) && ((__PERIOD__) <= 0x0000FFFFU)) : ((__PERIOD__) > 0U))
+
 #define IS_TIM_COMPLEMENTARY_CHANNELS(__CHANNEL__) (((__CHANNEL__) == TIM_CHANNEL_1) || \
                                                     ((__CHANNEL__) == TIM_CHANNEL_2) || \
                                                     ((__CHANNEL__) == TIM_CHANNEL_3))
 
 #define IS_TIM_CLOCKSOURCE(__CLOCK__) (((__CLOCK__) == TIM_CLOCKSOURCE_INTERNAL) || \
+                                       ((__CLOCK__) == TIM_CLOCKSOURCE_ETRMODE1) || \
                                        ((__CLOCK__) == TIM_CLOCKSOURCE_ETRMODE2) || \
-                                       ((__CLOCK__) == TIM_CLOCKSOURCE_ITR0)     || \
-                                       ((__CLOCK__) == TIM_CLOCKSOURCE_ITR1)     || \
-                                       ((__CLOCK__) == TIM_CLOCKSOURCE_ITR2)     || \
-                                       ((__CLOCK__) == TIM_CLOCKSOURCE_ITR3)     || \
                                        ((__CLOCK__) == TIM_CLOCKSOURCE_TI1ED)    || \
                                        ((__CLOCK__) == TIM_CLOCKSOURCE_TI1)      || \
                                        ((__CLOCK__) == TIM_CLOCKSOURCE_TI2)      || \
-                                       ((__CLOCK__) == TIM_CLOCKSOURCE_ETRMODE1))
+                                       ((__CLOCK__) == TIM_CLOCKSOURCE_ITR0)     || \
+                                       ((__CLOCK__) == TIM_CLOCKSOURCE_ITR1)     || \
+                                       ((__CLOCK__) == TIM_CLOCKSOURCE_ITR2)     || \
+                                       ((__CLOCK__) == TIM_CLOCKSOURCE_ITR3))
 
 #define IS_TIM_CLOCKPOLARITY(__POLARITY__) (((__POLARITY__) == TIM_CLOCKPOLARITY_INVERTED)    || \
                                             ((__POLARITY__) == TIM_CLOCKPOLARITY_NONINVERTED) || \
@@ -1965,13 +1988,13 @@ mode.
                                    ((__MODE__) == TIM_OCMODE_RETRIGERRABLE_OPM1) || \
                                    ((__MODE__) == TIM_OCMODE_RETRIGERRABLE_OPM2))
 
-#define IS_TIM_TRIGGER_SELECTION(__SELECTION__) (((__SELECTION__) == TIM_TS_ITR0) || \
-                                                 ((__SELECTION__) == TIM_TS_ITR1) || \
-                                                 ((__SELECTION__) == TIM_TS_ITR2) || \
-                                                 ((__SELECTION__) == TIM_TS_ITR3) || \
+#define IS_TIM_TRIGGER_SELECTION(__SELECTION__) (((__SELECTION__) == TIM_TS_ITR0)    || \
+                                                 ((__SELECTION__) == TIM_TS_ITR1)    || \
+                                                 ((__SELECTION__) == TIM_TS_ITR2)    || \
+                                                 ((__SELECTION__) == TIM_TS_ITR3)    || \
                                                  ((__SELECTION__) == TIM_TS_TI1F_ED) || \
-                                                 ((__SELECTION__) == TIM_TS_TI1FP1) || \
-                                                 ((__SELECTION__) == TIM_TS_TI2FP2) || \
+                                                 ((__SELECTION__) == TIM_TS_TI1FP1)  || \
+                                                 ((__SELECTION__) == TIM_TS_TI2FP2)  || \
                                                  ((__SELECTION__) == TIM_TS_ETRF))
 
 #define IS_TIM_INTERNAL_TRIGGEREVENT_SELECTION(__SELECTION__) (((__SELECTION__) == TIM_TS_ITR0) || \
