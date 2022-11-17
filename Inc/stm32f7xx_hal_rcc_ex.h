@@ -1326,6 +1326,7 @@ typedef struct
                                         UNUSED(tmpreg); \
                                       } while(0)
 
+#if defined (STM32F745xx) || defined (STM32F746xx) || defined (STM32F750xx) || defined (STM32F756xx) || defined (STM32F765xx) || defined (STM32F767xx) || defined (STM32F769xx) || defined (STM32F777xx) || defined (STM32F779xx)
 #define __HAL_RCC_SPI6_CLK_ENABLE()   do { \
                                         __IO uint32_t tmpreg; \
                                         SET_BIT(RCC->APB2ENR, RCC_APB2ENR_SPI6EN);\
@@ -1333,6 +1334,7 @@ typedef struct
                                         tmpreg = READ_BIT(RCC->APB2ENR, RCC_APB2ENR_SPI6EN);\
                                         UNUSED(tmpreg); \
                                       } while(0)
+#endif /* STM32F745xx || STM32F746xx || STM32F750xx || STM32F756xx || STM32F765xx || STM32F767xx || STM32F769xx || STM32F777xx || STM32F779xx */
 
 #define __HAL_RCC_SAI1_CLK_ENABLE()   do { \
                                         __IO uint32_t tmpreg; \
@@ -1415,7 +1417,9 @@ typedef struct
 #define __HAL_RCC_TIM10_CLK_DISABLE()  (RCC->APB2ENR &= ~(RCC_APB2ENR_TIM10EN))
 #define __HAL_RCC_TIM11_CLK_DISABLE()  (RCC->APB2ENR &= ~(RCC_APB2ENR_TIM11EN))
 #define __HAL_RCC_SPI5_CLK_DISABLE()   (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI5EN))
+#if defined (STM32F745xx) || defined (STM32F746xx) || defined (STM32F750xx) || defined (STM32F756xx) || defined (STM32F765xx) || defined (STM32F767xx) || defined (STM32F769xx) || defined (STM32F777xx) || defined (STM32F779xx)
 #define __HAL_RCC_SPI6_CLK_DISABLE()   (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI6EN))
+#endif /* STM32F745xx || STM32F746xx || STM32F750xx || STM32F756xx || STM32F765xx || STM32F767xx || STM32F769xx || STM32F777xx || STM32F779xx */
 #define __HAL_RCC_SAI1_CLK_DISABLE()   (RCC->APB2ENR &= ~(RCC_APB2ENR_SAI1EN))
 #define __HAL_RCC_SAI2_CLK_DISABLE()   (RCC->APB2ENR &= ~(RCC_APB2ENR_SAI2EN))
 #if defined (STM32F746xx) || defined (STM32F756xx) || defined (STM32F767xx) || defined (STM32F769xx) || defined (STM32F777xx) || defined (STM32F779xx) || defined (STM32F750xx)
