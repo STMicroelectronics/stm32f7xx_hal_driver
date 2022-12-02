@@ -6668,13 +6668,16 @@ static HAL_StatusTypeDef I2C_WaitOnFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uin
     {
       if (((HAL_GetTick() - Tickstart) > Timeout) || (Timeout == 0U))
       {
-        hi2c->ErrorCode |= HAL_I2C_ERROR_TIMEOUT;
-        hi2c->State = HAL_I2C_STATE_READY;
-        hi2c->Mode = HAL_I2C_MODE_NONE;
+        if ((__HAL_I2C_GET_FLAG(hi2c, Flag) == Status))
+        {
+          hi2c->ErrorCode |= HAL_I2C_ERROR_TIMEOUT;
+          hi2c->State = HAL_I2C_STATE_READY;
+          hi2c->Mode = HAL_I2C_MODE_NONE;
 
-        /* Process Unlocked */
-        __HAL_UNLOCK(hi2c);
-        return HAL_ERROR;
+          /* Process Unlocked */
+          __HAL_UNLOCK(hi2c);
+          return HAL_ERROR;
+        }
       }
     }
   }
@@ -6705,14 +6708,17 @@ static HAL_StatusTypeDef I2C_WaitOnTXISFlagUntilTimeout(I2C_HandleTypeDef *hi2c,
     {
       if (((HAL_GetTick() - Tickstart) > Timeout) || (Timeout == 0U))
       {
-        hi2c->ErrorCode |= HAL_I2C_ERROR_TIMEOUT;
-        hi2c->State = HAL_I2C_STATE_READY;
-        hi2c->Mode = HAL_I2C_MODE_NONE;
+        if ((__HAL_I2C_GET_FLAG(hi2c, I2C_FLAG_TXIS) == RESET))
+        {
+          hi2c->ErrorCode |= HAL_I2C_ERROR_TIMEOUT;
+          hi2c->State = HAL_I2C_STATE_READY;
+          hi2c->Mode = HAL_I2C_MODE_NONE;
 
-        /* Process Unlocked */
-        __HAL_UNLOCK(hi2c);
+          /* Process Unlocked */
+          __HAL_UNLOCK(hi2c);
 
-        return HAL_ERROR;
+          return HAL_ERROR;
+        }
       }
     }
   }
@@ -6741,14 +6747,17 @@ static HAL_StatusTypeDef I2C_WaitOnSTOPFlagUntilTimeout(I2C_HandleTypeDef *hi2c,
     /* Check for the Timeout */
     if (((HAL_GetTick() - Tickstart) > Timeout) || (Timeout == 0U))
     {
-      hi2c->ErrorCode |= HAL_I2C_ERROR_TIMEOUT;
-      hi2c->State = HAL_I2C_STATE_READY;
-      hi2c->Mode = HAL_I2C_MODE_NONE;
+      if ((__HAL_I2C_GET_FLAG(hi2c, I2C_FLAG_STOPF) == RESET))
+      {
+        hi2c->ErrorCode |= HAL_I2C_ERROR_TIMEOUT;
+        hi2c->State = HAL_I2C_STATE_READY;
+        hi2c->Mode = HAL_I2C_MODE_NONE;
 
-      /* Process Unlocked */
-      __HAL_UNLOCK(hi2c);
+        /* Process Unlocked */
+        __HAL_UNLOCK(hi2c);
 
-      return HAL_ERROR;
+        return HAL_ERROR;
+      }
     }
   }
   return HAL_OK;
@@ -6815,13 +6824,16 @@ static HAL_StatusTypeDef I2C_WaitOnRXNEFlagUntilTimeout(I2C_HandleTypeDef *hi2c,
     /* Check for the Timeout */
     if (((HAL_GetTick() - Tickstart) > Timeout) || (Timeout == 0U))
     {
-      hi2c->ErrorCode |= HAL_I2C_ERROR_TIMEOUT;
-      hi2c->State = HAL_I2C_STATE_READY;
+      if ((__HAL_I2C_GET_FLAG(hi2c, I2C_FLAG_RXNE) == RESET))
+      {
+        hi2c->ErrorCode |= HAL_I2C_ERROR_TIMEOUT;
+        hi2c->State = HAL_I2C_STATE_READY;
 
-      /* Process Unlocked */
-      __HAL_UNLOCK(hi2c);
+        /* Process Unlocked */
+        __HAL_UNLOCK(hi2c);
 
-      return HAL_ERROR;
+        return HAL_ERROR;
+      }
     }
   }
   return HAL_OK;
