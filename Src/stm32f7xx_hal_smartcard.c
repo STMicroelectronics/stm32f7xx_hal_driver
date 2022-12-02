@@ -2425,6 +2425,19 @@ static HAL_StatusTypeDef SMARTCARD_CheckIdleState(SMARTCARD_HandleTypeDef *hsmar
       return HAL_TIMEOUT;
     }
   }
+#if defined(USART_ISR_REACK)
+  /* Check if the Receiver is enabled */
+  if ((hsmartcard->Instance->CR1 & USART_CR1_RE) == USART_CR1_RE)
+  {
+    /* Wait until REACK flag is set */
+    if (SMARTCARD_WaitOnFlagUntilTimeout(hsmartcard, USART_ISR_REACK, RESET, tickstart,
+                                         SMARTCARD_TEACK_REACK_TIMEOUT) != HAL_OK)
+    {
+      /* Timeout occurred */
+      return HAL_TIMEOUT;
+    }
+  }
+#endif /* USART_ISR_REACK */
 
   /* Initialize the SMARTCARD states */
   hsmartcard->gState  = HAL_SMARTCARD_STATE_READY;
