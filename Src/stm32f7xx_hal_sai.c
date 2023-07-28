@@ -1264,6 +1264,9 @@ HAL_StatusTypeDef HAL_SAI_DMAStop(SAI_HandleTypeDef *hsai)
   /* Process Locked */
   __HAL_LOCK(hsai);
 
+  /* Disable SAI peripheral */
+  SAI_Disable(hsai);
+
   /* Disable the SAI DMA request */
   hsai->Instance->CR1 &= ~SAI_xCR1_DMAEN;
 
@@ -1295,9 +1298,6 @@ HAL_StatusTypeDef HAL_SAI_DMAStop(SAI_HandleTypeDef *hsai)
     }
   }
 
-  /* Disable SAI peripheral */
-  SAI_Disable(hsai);
-
   /* Flush the fifo */
   SET_BIT(hsai->Instance->CR2, SAI_xCR2_FFLUSH);
 
@@ -1322,6 +1322,9 @@ HAL_StatusTypeDef HAL_SAI_Abort(SAI_HandleTypeDef *hsai)
 
   /* Process Locked */
   __HAL_LOCK(hsai);
+
+  /* Disable SAI peripheral */
+  SAI_Disable(hsai);
 
   /* Check SAI DMA is enabled or not */
   if ((hsai->Instance->CR1 & SAI_xCR1_DMAEN) == SAI_xCR1_DMAEN)
@@ -1360,9 +1363,6 @@ HAL_StatusTypeDef HAL_SAI_Abort(SAI_HandleTypeDef *hsai)
   /* Disabled All interrupt and clear all the flag */
   hsai->Instance->IMR = 0;
   hsai->Instance->CLRFR = 0xFFFFFFFFU;
-
-  /* Disable SAI peripheral */
-  SAI_Disable(hsai);
 
   /* Flush the fifo */
   SET_BIT(hsai->Instance->CR2, SAI_xCR2_FFLUSH);
