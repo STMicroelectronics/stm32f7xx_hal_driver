@@ -2181,11 +2181,11 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive_DMA(I2C_HandleTypeDef *hi2c, uint16_t D
       /* Note : The I2C interrupts must be enabled after unlocking current process
                 to avoid the risk of I2C interrupt handle execution before current
                 process unlock */
-      /* Enable ERR, TC, STOP, NACK, TXI interrupt */
+      /* Enable ERR, TC, STOP, NACK, RXI interrupt */
       /* possible to enable all of these */
       /* I2C_IT_ERRI | I2C_IT_TCI | I2C_IT_STOPI | I2C_IT_NACKI |
         I2C_IT_ADDRI | I2C_IT_RXI | I2C_IT_TXI */
-      I2C_Enable_IRQ(hi2c, I2C_XFER_TX_IT);
+      I2C_Enable_IRQ(hi2c, I2C_XFER_RX_IT);
     }
 
     return HAL_OK;
@@ -2839,11 +2839,11 @@ HAL_StatusTypeDef HAL_I2C_Mem_Read_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddre
               to avoid the risk of I2C interrupt handle execution before current
               process unlock */
 
-    /* Enable ERR, TC, STOP, NACK, RXI interrupt */
+    /* Enable ERR, TC, STOP, NACK, TXI interrupt */
     /* possible to enable all of these */
     /* I2C_IT_ERRI | I2C_IT_TCI | I2C_IT_STOPI | I2C_IT_NACKI |
       I2C_IT_ADDRI | I2C_IT_RXI | I2C_IT_TXI */
-    I2C_Enable_IRQ(hi2c, (I2C_XFER_TX_IT | I2C_XFER_RX_IT));
+    I2C_Enable_IRQ(hi2c, I2C_XFER_TX_IT);
 
     return HAL_OK;
   }
@@ -3834,11 +3834,11 @@ HAL_StatusTypeDef HAL_I2C_Master_Seq_Receive_DMA(I2C_HandleTypeDef *hi2c, uint16
       /* Note : The I2C interrupts must be enabled after unlocking current process
                 to avoid the risk of I2C interrupt handle execution before current
                 process unlock */
-      /* Enable ERR, TC, STOP, NACK, TXI interrupt */
+      /* Enable ERR, TC, STOP, NACK, RXI interrupt */
       /* possible to enable all of these */
       /* I2C_IT_ERRI | I2C_IT_TCI | I2C_IT_STOPI | I2C_IT_NACKI |
         I2C_IT_ADDRI | I2C_IT_RXI | I2C_IT_TXI */
-      I2C_Enable_IRQ(hi2c, I2C_XFER_TX_IT);
+      I2C_Enable_IRQ(hi2c, I2C_XFER_RX_IT);
     }
 
     return HAL_OK;
@@ -5083,6 +5083,12 @@ static HAL_StatusTypeDef I2C_Mem_ISR_IT(struct __I2C_HandleTypeDef *hi2c, uint32
   else if ((I2C_CHECK_FLAG(tmpITFlags, I2C_FLAG_TC) != RESET) && \
            (I2C_CHECK_IT_SOURCE(ITSources, I2C_IT_TCI) != RESET))
   {
+    /* Disable Interrupt related to address step */
+    I2C_Disable_IRQ(hi2c, I2C_XFER_TX_IT);
+
+    /* Enable ERR, TC, STOP, NACK and RXI interrupts */
+    I2C_Enable_IRQ(hi2c, I2C_XFER_RX_IT);
+
     if (hi2c->State == HAL_I2C_STATE_BUSY_RX)
     {
       direction = I2C_GENERATE_START_READ;
@@ -5448,6 +5454,9 @@ static HAL_StatusTypeDef I2C_Mem_ISR_DMA(struct __I2C_HandleTypeDef *hi2c, uint3
   else if ((I2C_CHECK_FLAG(ITFlags, I2C_FLAG_TCR) != RESET) && \
            (I2C_CHECK_IT_SOURCE(ITSources, I2C_IT_TCI) != RESET))
   {
+    /* Disable Interrupt related to address step */
+    I2C_Disable_IRQ(hi2c, I2C_XFER_TX_IT);
+
     /* Enable only Error interrupt */
     I2C_Enable_IRQ(hi2c, I2C_XFER_ERROR_IT);
 
@@ -5490,6 +5499,12 @@ static HAL_StatusTypeDef I2C_Mem_ISR_DMA(struct __I2C_HandleTypeDef *hi2c, uint3
   else if ((I2C_CHECK_FLAG(ITFlags, I2C_FLAG_TC) != RESET) && \
            (I2C_CHECK_IT_SOURCE(ITSources, I2C_IT_TCI) != RESET))
   {
+    /* Disable Interrupt related to address step */
+    I2C_Disable_IRQ(hi2c, I2C_XFER_TX_IT);
+
+    /* Enable only Error and NACK interrupt for data transfer */
+    I2C_Enable_IRQ(hi2c, I2C_XFER_ERROR_IT);
+
     if (hi2c->State == HAL_I2C_STATE_BUSY_RX)
     {
       direction = I2C_GENERATE_START_READ;
@@ -6174,7 +6189,8 @@ static void I2C_ITSlaveCplt(I2C_HandleTypeDef *hi2c, uint32_t ITFlags)
   __HAL_I2C_CLEAR_FLAG(hi2c, I2C_FLAG_STOPF);
 
   /* Disable Interrupts and Store Previous state */
-  if ((tmpstate == HAL_I2C_STATE_BUSY_TX) || (tmpstate == HAL_I2C_STATE_BUSY_TX_LISTEN))
+  if ((tmpstate == HAL_I2C_STATE_BUSY_TX) || (tmpstate == HAL_I2C_STATE_BUSY_TX_LISTEN) ||
+      (tmpstate == HAL_I2C_STATE_LISTEN))
   {
     I2C_Disable_IRQ(hi2c, I2C_XFER_LISTEN_IT | I2C_XFER_TX_IT);
     hi2c->PreviousState = I2C_STATE_SLAVE_BUSY_TX;
@@ -7219,13 +7235,13 @@ static void I2C_Enable_IRQ(I2C_HandleTypeDef *hi2c, uint16_t InterruptRequest)
 
     if ((InterruptRequest & I2C_XFER_TX_IT) == I2C_XFER_TX_IT)
     {
-      /* Enable ERR, TC, STOP, NACK and RXI interrupts */
+      /* Enable ERR, TC, STOP, NACK and TXI interrupts */
       tmpisr |= I2C_IT_ERRI | I2C_IT_TCI | I2C_IT_STOPI | I2C_IT_NACKI | I2C_IT_TXI;
     }
 
     if ((InterruptRequest & I2C_XFER_RX_IT) == I2C_XFER_RX_IT)
     {
-      /* Enable ERR, TC, STOP, NACK and TXI interrupts */
+      /* Enable ERR, TC, STOP, NACK and RXI interrupts */
       tmpisr |= I2C_IT_ERRI | I2C_IT_TCI | I2C_IT_STOPI | I2C_IT_NACKI | I2C_IT_RXI;
     }
 
