@@ -122,7 +122,9 @@ static HAL_StatusTypeDef PCD_EP_OutSetupPacket_int(PCD_HandleTypeDef *hpcd, uint
   */
 HAL_StatusTypeDef HAL_PCD_Init(PCD_HandleTypeDef *hpcd)
 {
-  USB_OTG_GlobalTypeDef *USBx;
+#if defined (USB_OTG_FS)
+  const USB_OTG_GlobalTypeDef *USBx;
+#endif /* defined (USB_OTG_FS) */
   uint8_t i;
 
   /* Check the PCD handle allocation */
@@ -134,7 +136,9 @@ HAL_StatusTypeDef HAL_PCD_Init(PCD_HandleTypeDef *hpcd)
   /* Check the parameters */
   assert_param(IS_PCD_ALL_INSTANCE(hpcd->Instance));
 
+#if defined (USB_OTG_FS)
   USBx = hpcd->Instance;
+#endif /* defined (USB_OTG_FS) */
 
   if (hpcd->State == HAL_PCD_STATE_RESET)
   {
@@ -169,11 +173,13 @@ HAL_StatusTypeDef HAL_PCD_Init(PCD_HandleTypeDef *hpcd)
 
   hpcd->State = HAL_PCD_STATE_BUSY;
 
+#if defined (USB_OTG_FS)
   /* Disable DMA mode for FS instance */
-  if ((USBx->CID & (0x1U << 8)) == 0U)
+  if (USBx == USB_OTG_FS)
   {
     hpcd->Init.dma_enable = 0U;
   }
+#endif /* defined (USB_OTG_FS) */
 
   /* Disable the Interrupts */
   __HAL_PCD_DISABLE(hpcd);
@@ -1419,16 +1425,17 @@ void HAL_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)
   */
 void HAL_PCD_WKUP_IRQHandler(PCD_HandleTypeDef *hpcd)
 {
+#if defined (USB_OTG_FS)
   USB_OTG_GlobalTypeDef *USBx;
-
   USBx = hpcd->Instance;
 
-  if ((USBx->CID & (0x1U << 8)) == 0U)
+  if (USBx == USB_OTG_FS)
   {
     /* Clear EXTI pending Bit */
     __HAL_USB_OTG_FS_WAKEUP_EXTI_CLEAR_FLAG();
   }
   else
+#endif /* defined (USB_OTG_FS) */
   {
     /* Clear EXTI pending Bit */
     __HAL_USB_OTG_HS_WAKEUP_EXTI_CLEAR_FLAG();
