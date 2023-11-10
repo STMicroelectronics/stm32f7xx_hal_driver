@@ -1193,6 +1193,7 @@ HAL_StatusTypeDef HAL_ETH_ReadData(ETH_HandleTypeDef *heth, void **pAppBuff)
   */
 static void ETH_UpdateDescriptor(ETH_HandleTypeDef *heth)
 {
+  uint32_t tailidx;
   uint32_t descidx;
   uint32_t desccount;
   ETH_DMADescTypeDef *dmarxdesc;
@@ -1238,12 +1239,6 @@ static void ETH_UpdateDescriptor(ETH_HandleTypeDef *heth)
         WRITE_REG(dmarxdesc->DESC1, ETH_RX_BUF_SIZE | ETH_DMARXDESC_RCH);
       }
 
-      /* Before transferring the ownership to DMA, make sure that the RX descriptors bits writing
-         is fully performed.
-         The __DMB() instruction is added to avoid any potential compiler optimization that
-         may lead to abnormal behavior. */
-      __DMB();
-
       SET_BIT(dmarxdesc->DESC0, ETH_DMARXDESC_OWN);
 
       /* Increment current rx descriptor index */
@@ -1256,8 +1251,14 @@ static void ETH_UpdateDescriptor(ETH_HandleTypeDef *heth)
 
   if (heth->RxDescList.RxBuildDescCnt != desccount)
   {
+    /* Set the tail pointer index */
+    tailidx = (descidx + 1U) % ETH_RX_DESC_CNT;
+
+    /* DMB instruction to avoid race condition */
+    __DMB();
+
     /* Set the Tail pointer address */
-    WRITE_REG(heth->Instance->DMARPDR, 0);
+    WRITE_REG(heth->Instance->DMARPDR, ((uint32_t)(heth->Init.RxDesc + (tailidx))));
 
     heth->RxDescList.RxBuildDescIdx = descidx;
     heth->RxDescList.RxBuildDescCnt = desccount;
