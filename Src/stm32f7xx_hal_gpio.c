@@ -364,7 +364,7 @@ void HAL_GPIO_DeInit(GPIO_TypeDef  *GPIOx, uint32_t GPIO_Pin)
   * @brief  Reads the specified input port pin.
   * @param  GPIOx where x can be (A..K) to select the GPIO peripheral.
   * @param  GPIO_Pin specifies the port bit to read.
-  *         This parameter can be any combination of GPIO_Pin_x where x can be (0..15).
+  *         This parameter can be any combination of GPIO_PIN_x where x can be (0..15).
   * @retval The input port pin value.
   */
 GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
@@ -394,7 +394,7 @@ GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
   *
   * @param  GPIOx where x can be (A..K) to select the GPIO peripheral.
   * @param  GPIO_Pin specifies the port bit to be written.
-  *         This parameter can be any combination of GPIO_Pin_x where x can be (0..15).
+  *         This parameter can be any combination of GPIO_PIN_x where x can be (0..15).
   * @param  PinState specifies the value to be written to the selected bit.
   *          This parameter can be one of the GPIO_PinState enum values:
   *            @arg GPIO_PIN_RESET: to clear the port pin
@@ -421,7 +421,7 @@ void HAL_GPIO_WritePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, GPIO_PinState Pin
   * @brief  Toggles the specified GPIO pins.
   * @param  GPIOx Where x can be (A..I) to select the GPIO peripheral.
   * @param  GPIO_Pin Specifies the pins to be toggled.
-  *         This parameter can be any combination of GPIO_Pin_x where x can be (0..15).
+  *         This parameter can be any combination of GPIO_PIN_x where x can be (0..15).
   * @retval None
   */
 void HAL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
