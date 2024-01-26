@@ -234,7 +234,7 @@
 #define ETH_REG_WRITE_DELAY     0x00000001U
 
 /* ETHERNET MACCR register Mask */
-#define ETH_MACCR_CLEAR_MASK    0xFF20810FU
+#define ETH_MACCR_CLEAR_MASK    0xFD20810FU
 
 /* ETHERNET MACFCR register Mask */
 #define ETH_MACFCR_CLEAR_MASK   0x0000FF41U
@@ -1126,7 +1126,7 @@ HAL_StatusTypeDef HAL_ETH_ReadData(ETH_HandleTypeDef *heth, void **pAppBuff)
       if (READ_BIT(dmarxdesc->DESC0, ETH_DMARXDESC_LS) != (uint32_t)RESET)
       {
         /* Get the Frame Length of the received packet: substruct 4 bytes of the CRC */
-        bufflength = ((dmarxdesc->DESC0 & ETH_DMARXDESC_FL) >> ETH_DMARXDESC_FRAMELENGTHSHIFT) - 4U;
+      bufflength = ((dmarxdesc->DESC0 & ETH_DMARXDESC_FL) >> ETH_DMARXDESC_FRAMELENGTHSHIFT);
 
         /* Save Last descriptor index */
         heth->RxDescList.pRxLastRxDesc = dmarxdesc->DESC0;
@@ -2207,7 +2207,7 @@ HAL_StatusTypeDef HAL_ETH_GetMACConfig(ETH_HandleTypeDef *heth, ETH_MACConfigTyp
   macconf->AutomaticPadCRCStrip = ((READ_BIT(heth->Instance->MACCR, ETH_MACCR_APCS) >> 7) > 0U) ? ENABLE : DISABLE;
   macconf->InterPacketGapVal = READ_BIT(heth->Instance->MACCR, ETH_MACCR_IFG);
   macconf->ChecksumOffload = ((READ_BIT(heth->Instance->MACCR, ETH_MACCR_IPCO) >> 10U) > 0U) ? ENABLE : DISABLE;
-
+  macconf->CRCStripTypePacket = ((READ_BIT(heth->Instance->MACCR, ETH_MACCR_CSTF) >> 25U) > 0U) ? ENABLE : DISABLE;
 
   macconf->TransmitFlowControl = ((READ_BIT(heth->Instance->MACFCR, ETH_MACFCR_TFCE) >> 1) > 0U) ? ENABLE : DISABLE;
   macconf->ZeroQuantaPause = ((READ_BIT(heth->Instance->MACFCR, ETH_MACFCR_ZQPD) >> 7) == 0U) ? ENABLE : DISABLE;
@@ -2739,10 +2739,11 @@ static void ETH_SetMACConfig(ETH_HandleTypeDef *heth,  ETH_MACConfigTypeDef *mac
   /*------------------------ ETHERNET MACCR Configuration --------------------*/
   /* Get the ETHERNET MACCR value */
   tmpreg1 = (heth->Instance)->MACCR;
-  /* Clear WD, PCE, PS, TE and RE bits */
+  /* Clear CSTF, WD, PCE, PS, TE and RE bits */
   tmpreg1 &= ETH_MACCR_CLEAR_MASK;
 
-  tmpreg1 |= (uint32_t)(((uint32_t)((macconf->Watchdog == DISABLE) ? 1U : 0U) << 23U) |
+  tmpreg1 |= (uint32_t)(((uint32_t)macconf->CRCStripTypePacket << 25U) |
+                        ((uint32_t)((macconf->Watchdog == DISABLE) ? 1U : 0U) << 23U) |
                         ((uint32_t)((macconf->Jabber == DISABLE) ? 1U : 0U) << 22U) |
                         (uint32_t)macconf->InterPacketGapVal |
                         ((uint32_t)macconf->CarrierSenseDuringTransmit << 16U) |
@@ -2855,6 +2856,7 @@ static void ETH_MACDMAConfig(ETH_HandleTypeDef *heth)
   macDefaultConf.CarrierSenseDuringTransmit = DISABLE;
   macDefaultConf.ReceiveOwn = ENABLE;
   macDefaultConf.LoopbackMode = DISABLE;
+  macDefaultConf.CRCStripTypePacket = ENABLE;
   macDefaultConf.ChecksumOffload = ENABLE;
   macDefaultConf.RetryTransmission = DISABLE;
   macDefaultConf.AutomaticPadCRCStrip = DISABLE;
