@@ -1231,11 +1231,11 @@ static void ETH_UpdateDescriptor(ETH_HandleTypeDef *heth)
     {
       if (heth->RxDescList.ItMode == 0U)
       {
-        WRITE_REG(dmarxdesc->DESC1, ETH_DMARXDESC_DIC | ETH_RX_BUF_SIZE | ETH_DMARXDESC_RCH);
+        WRITE_REG(dmarxdesc->DESC1, heth->Init.RxBuffLen | ETH_DMARXDESC_DIC | ETH_DMARXDESC_RCH);
       }
       else
       {
-        WRITE_REG(dmarxdesc->DESC1, ETH_RX_BUF_SIZE | ETH_DMARXDESC_RCH);
+        WRITE_REG(dmarxdesc->DESC1, heth->Init.RxBuffLen | ETH_DMARXDESC_RCH);
       }
 
       SET_BIT(dmarxdesc->DESC0, ETH_DMARXDESC_OWN);
@@ -2999,7 +2999,7 @@ static void ETH_DMARxDescListInit(ETH_HandleTypeDef *heth)
     dmarxdesc->DESC0 = ETH_DMARXDESC_OWN;
 
     /* Set Buffer1 size and Second Address Chained bit */
-    dmarxdesc->DESC1 = ETH_DMARXDESC_RCH | ETH_RX_BUF_SIZE;
+    dmarxdesc->DESC1 = heth->Init.RxBuffLen | ETH_DMARXDESC_RCH;
 
     /* Enable Ethernet DMA Rx Descriptor interrupt */
     dmarxdesc->DESC1 &= ~ETH_DMARXDESC_DIC;
