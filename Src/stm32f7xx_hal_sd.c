@@ -2868,7 +2868,7 @@ static uint32_t SD_SendSDStatus(SD_HandleTypeDef *hsd, uint32_t *pSDstatus)
       }
     }
 
-    if((HAL_GetTick() - tickstart) >=  SDMMC_DATATIMEOUT)
+    if((HAL_GetTick() - tickstart) >=  SDMMC_SWDATATIMEOUT)
     {
       return HAL_SD_ERROR_TIMEOUT;
     }
@@ -2896,7 +2896,7 @@ static uint32_t SD_SendSDStatus(SD_HandleTypeDef *hsd, uint32_t *pSDstatus)
     *pData = SDMMC_ReadFIFO(hsd->Instance);
     pData++;
 
-    if((HAL_GetTick() - tickstart) >=  SDMMC_DATATIMEOUT)
+    if((HAL_GetTick() - tickstart) >=  SDMMC_SWDATATIMEOUT)
     {
       return HAL_SD_ERROR_TIMEOUT;
     }
@@ -3088,7 +3088,7 @@ static uint32_t SD_FindSCR(SD_HandleTypeDef *hsd, uint32_t *pSCR)
       break;
     }
 
-    if((HAL_GetTick() - tickstart) >=  SDMMC_DATATIMEOUT)
+    if((HAL_GetTick() - tickstart) >=  SDMMC_SWDATATIMEOUT)
     {
       return HAL_SD_ERROR_TIMEOUT;
     }
