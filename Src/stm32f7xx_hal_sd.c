@@ -403,7 +403,6 @@ HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
 HAL_StatusTypeDef HAL_SD_InitCard(SD_HandleTypeDef *hsd)
 {
   uint32_t errorstate;
-  HAL_StatusTypeDef status;
   SD_InitTypeDef Init;
   
   /* Default SDMMC peripheral configuration for SD card initialization */
@@ -415,11 +414,7 @@ HAL_StatusTypeDef HAL_SD_InitCard(SD_HandleTypeDef *hsd)
   Init.ClockDiv            = SDMMC_INIT_CLK_DIV;
 
   /* Initialize SDMMC peripheral interface with default configuration */
-  status = SDMMC_Init(hsd->Instance, Init);
-  if(status != HAL_OK)
-  {
-    return HAL_ERROR;
-  }
+  SDMMC_Init(hsd->Instance, Init);
 
   /* Disable SDMMC Clock */
   __HAL_SD_DISABLE(hsd);
