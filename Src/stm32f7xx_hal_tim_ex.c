@@ -2164,11 +2164,13 @@ HAL_StatusTypeDef HAL_TIMEx_ConfigBreakInput(TIM_HandleTypeDef *htim,
       /* Set the break input polarity */
 #if defined(DFSDM1_Channel0)
       if (sBreakInputConfig->Source != TIM_BREAKINPUTSOURCE_DFSDM1)
-#endif /* DFSDM1_Channel0 */
       {
+#endif /* DFSDM1_Channel0 */
         tmporx &= ~bkin_polarity_mask;
         tmporx |= (sBreakInputConfig->Polarity << bkin_polarity_bitpos) & bkin_polarity_mask;
+#if defined(DFSDM1_Channel0)
       }
+#endif /* DFSDM1_Channel0 */
 
       /* Set TIMx_AF1 */
       htim->Instance->AF1 = tmporx;
@@ -2186,11 +2188,13 @@ HAL_StatusTypeDef HAL_TIMEx_ConfigBreakInput(TIM_HandleTypeDef *htim,
       /* Set the break input polarity */
 #if defined(DFSDM1_Channel0)
       if (sBreakInputConfig->Source != TIM_BREAKINPUTSOURCE_DFSDM1)
-#endif /* DFSDM1_Channel0 */
       {
+#endif /* DFSDM1_Channel0 */
         tmporx &= ~bkin_polarity_mask;
         tmporx |= (sBreakInputConfig->Polarity << bkin_polarity_bitpos) & bkin_polarity_mask;
+#if  defined(DFSDM1_Channel0)
       }
+#endif /* DFSDM1_Channel0 */
 
       /* Set TIMx_AF2 */
       htim->Instance->AF2 = tmporx;
