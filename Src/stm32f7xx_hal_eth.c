@@ -1204,8 +1204,8 @@ static void ETH_UpdateDescriptor(ETH_HandleTypeDef *heth)
     /* Set the tail pointer index */
     tailidx = (ETH_RX_DESC_CNT + descidx - 1U) % ETH_RX_DESC_CNT;
 
-    /* DMB instruction to avoid race condition */
-    __DMB();
+    /* DSB instruction to avoid race condition */
+    __DSB();
 
     /* Set the Tail pointer address */
     WRITE_REG(heth->Instance->DMARPDR, ((uint32_t)(heth->Init.RxDesc + (tailidx))));
